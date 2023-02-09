@@ -1,22 +1,17 @@
-"""
-Стиль цитирования по ГОСТ Р 7.0.5-2008.
-"""
 from string import Template
 from typing import Dict
-
 from pydantic import BaseModel
-
 from formatters.base import BaseCitationFormatter
+from formatters.styles.base import BaseCitationStyle
 from formatters.models import BookModel, InternetResourceModel, ArticlesCollectionModel, DissertationModel, \
     NormativeActModel
-from formatters.styles.base import BaseCitationStyle
 from logger import get_logger
 
 
 logger = get_logger(__name__)
 
 
-class GOSTBook(BaseCitationStyle):
+class APABook(BaseCitationStyle):
     """
     Форматирование для книг.
     """
@@ -26,7 +21,7 @@ class GOSTBook(BaseCitationStyle):
     @property
     def template(self) -> Template:
         return Template(
-            "$authors $title. – $edition$city: $publishing_house, $year. – $pages с."
+            "$authors ($year). $title $edition. $publishing_house."
         )
 
     def substitute(self) -> str:
@@ -50,10 +45,10 @@ class GOSTBook(BaseCitationStyle):
         :return: Информация об издательстве.
         """
 
-        return f"{self.data.edition} изд. – " if self.data.edition else ""
+        return f"({self.data.edition} изд.)" if self.data.edition else ""
 
 
-class GOSTInternetResource(BaseCitationStyle):
+class APAInternetResource(BaseCitationStyle):
     """
     Форматирование для интернет-ресурсов.
     """
@@ -63,7 +58,7 @@ class GOSTInternetResource(BaseCitationStyle):
     @property
     def template(self) -> Template:
         return Template(
-            "$article // $website URL: $link (дата обращения: $access_date)."
+            "$article. (n.d.). $website. Retrieved $access_date, from $link"
         )
 
     def substitute(self) -> str:
@@ -78,7 +73,7 @@ class GOSTInternetResource(BaseCitationStyle):
         )
 
 
-class GOSTCollectionArticle(BaseCitationStyle):
+class APACollectionArticle(BaseCitationStyle):
     """
     Форматирование для статьи из сборника.
     """
@@ -88,7 +83,7 @@ class GOSTCollectionArticle(BaseCitationStyle):
     @property
     def template(self) -> Template:
         return Template(
-            "$authors $article_title // $collection_title. – $city: $publishing_house, $year. – С. $pages."
+            "$authors ($year). $article_title. $collection_title, $pages."
         )
 
     def substitute(self) -> str:
@@ -106,7 +101,7 @@ class GOSTCollectionArticle(BaseCitationStyle):
         )
 
 
-class GOSTDissertation(BaseCitationStyle):
+class APADissertation(BaseCitationStyle):
     """
     Форматирование для диссертации.
     """
@@ -116,8 +111,7 @@ class GOSTDissertation(BaseCitationStyle):
     @property
     def template(self) -> Template:
         return Template(
-            "$author $title : дис. ... $author_degree $science_branch наук: $branch_code. $city,"
-            " $year. $page_count с."
+            "$author ($year). $title [$author_degree, some university]."
         )
 
     def substitute(self) -> str:
@@ -136,7 +130,7 @@ class GOSTDissertation(BaseCitationStyle):
         )
 
 
-class GOSTNormativeAct(BaseCitationStyle):
+class APANormativeAct(BaseCitationStyle):
     """
     Форматирование для нормативно-правовых актов.
     """
@@ -146,8 +140,7 @@ class GOSTNormativeAct(BaseCitationStyle):
     @property
     def template(self) -> Template:
         return Template(
-            "$title : $type от $acceptance_date г. №$number // $publication_source. $publication_year. "
-            "№$source_number. Ст. $article_number. $edition_date."
+            "$title $publication_year ($type) s.$source_number.$article_number (Russia)."
         )
 
     def substitute(self) -> str:
@@ -176,16 +169,16 @@ class GOSTNormativeAct(BaseCitationStyle):
         return f"ред. от {self.data.edition_date}" if self.data.edition_date else ""
 
 
-class GOSTCitationFormatter(BaseCitationFormatter):
+class APACitationFormatter(BaseCitationFormatter):
     """
-    Класс для форматирования списка источников по ГОСТ 7.0.5-2008.
+    Класс для форматирования списка источников по стандарту APA 7
     """
 
     formatters_map: Dict[BaseModel, BaseCitationStyle] = {
-        BookModel: GOSTBook,
-        InternetResourceModel: GOSTInternetResource,
-        ArticlesCollectionModel: GOSTCollectionArticle,
-        DissertationModel: GOSTDissertation,
-        NormativeActModel: GOSTNormativeAct
+        BookModel: APABook,
+        InternetResourceModel: APAInternetResource,
+        ArticlesCollectionModel: APACollectionArticle,
+        DissertationModel: APADissertation,
+        NormativeActModel: APANormativeAct
     }
 
