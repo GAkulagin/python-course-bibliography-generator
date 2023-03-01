@@ -5,10 +5,8 @@
 from abc import ABC, abstractmethod
 from datetime import date
 from typing import Type
-
 from openpyxl.workbook import Workbook
 from pydantic import BaseModel
-
 from logger import get_logger
 
 logger = get_logger(__name__)

@@ -7,10 +7,10 @@ from typing import Type
 import openpyxl
 from openpyxl.workbook import Workbook
 
-from formatters.models import BookModel, InternetResourceModel, ArticlesCollectionModel
+from formatters.models import BookModel, InternetResourceModel, ArticlesCollectionModel, DissertationModel, \
+    NormativeActModel
 from logger import get_logger
 from readers.base import BaseReader
-
 
 logger = get_logger(__name__)
 
@@ -90,6 +90,61 @@ class ArticlesCollectionReader(BaseReader):
         }
 
 
+class DissertationReader(BaseReader):
+    """
+    Чтение модели научной диссертации.
+    """
+
+    @property
+    def model(self) -> Type[DissertationModel]:
+        return DissertationModel
+
+    @property
+    def sheet(self) -> str:
+        return "Диссертация"
+
+    @property
+    def attributes(self) -> dict:
+        return {
+            "author": {0: str},
+            "title": {1: str},
+            "author_degree": {2: str},
+            "science_branch": {3: str},
+            "branch_code": {4: str},
+            "city": {5: str},
+            "year": {6: int},
+            "page_count": {7: int},
+        }
+
+
+class NormativeActReader(BaseReader):
+    """
+    Чтение модели нормативно-правового акта.
+    """
+
+    @property
+    def model(self) -> Type[NormativeActModel]:
+        return NormativeActModel
+
+    @property
+    def sheet(self) -> str:
+        return " Закон, нормативный акт и т.п."
+
+    @property
+    def attributes(self) -> dict:
+        return {
+            "type": {0: str},
+            "title": {1: str},
+            "acceptance_date": {2: date},
+            "number": {3: str},
+            "publication_source": {4: str},
+            "publication_year": {5: int},
+            "source_number": {6: int},
+            "article_number": {7: int},
+            "edition_date": {8: date},
+        }
+
+
 class SourcesReader:
     """
     Чтение из источника данных.
@@ -100,6 +155,8 @@ class SourcesReader:
         BookReader,
         InternetResourceReader,
         ArticlesCollectionReader,
+        DissertationReader,
+        NormativeActReader
     ]
 
     def __init__(self, path: str) -> None:

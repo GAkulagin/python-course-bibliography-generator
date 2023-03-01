@@ -1,9 +1,10 @@
 """
 Базовые функции форматирования списка источников
 """
-
+from typing import Dict
 from formatters.styles.base import BaseCitationStyle
 from logger import get_logger
+from pydantic import BaseModel
 
 
 logger = get_logger(__name__)
@@ -14,14 +15,18 @@ class BaseCitationFormatter:
     Базовый класс для итогового форматирования списка источников.
     """
 
-    def __init__(self, formatted_items: list[BaseCitationStyle]) -> None:
+    formatters_map: Dict[BaseModel, BaseCitationStyle]
+
+    def __init__(self, models: list[BaseModel]) -> None:
         """
         Конструктор.
 
-        :param formatted_items: Список объектов для итогового форматирования
+        :param models: Список моделей для итогового форматирования
         """
 
-        self.formatted_items = formatted_items
+        self.formatted_items = []
+        for model in models:
+            self.formatted_items.append(self.formatters_map.get(type(model))(model))  # type: ignore
 
     def format(self) -> list[BaseCitationStyle]:
         """

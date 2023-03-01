@@ -8,8 +8,10 @@ import click
 from formatters.styles.gost import GOSTCitationFormatter
 from logger import get_logger
 from readers.reader import SourcesReader
-from renderer import Renderer
+from renderer import BaseRenderer, GOSTRenderer, APARenderer
 from settings import INPUT_FILE_PATH, OUTPUT_FILE_PATH
+from formatters.base import BaseCitationFormatter
+from formatters.styles.apa import APACitationFormatter
 
 logger = get_logger(__name__)
 
@@ -21,7 +23,6 @@ class CitationEnum(Enum):
     """
 
     GOST = "gost"  # ГОСТ Р 7.0.5-2008
-    MLA = "mla"  # Modern Language Association
     APA = "apa"  # American Psychological Association
 
 
@@ -78,13 +79,43 @@ def process_input(
 
     models = SourcesReader(path_input).read()
     formatted_models = tuple(
-        str(item) for item in GOSTCitationFormatter(models).format()
+        str(item) for item in get_formatter(citation)(models).format()
     )
 
     logger.info("Генерация выходного файла ...")
-    Renderer(formatted_models).render(path_output)
+    get_renderer(citation)(formatted_models).render(path_output)
 
     logger.info("Команда успешно завершена.")
+
+
+def get_formatter(style: str) -> type[BaseCitationFormatter]:
+    """
+    Возвращает форматтер для указанного стиля цитирования.
+
+    :param str style: Стиль цитирования
+
+    :return: форматтер для заданного стиля цитирования.
+    """
+    format_styles_map = {
+        CitationEnum.GOST.name: GOSTCitationFormatter,
+        CitationEnum.APA.name: APACitationFormatter
+    }
+    return format_styles_map.get(style)
+
+
+def get_renderer(style: str) -> type[BaseRenderer]:
+    """
+    Возвращает объект BaseRenderer для указанного стиля цитирования.
+
+    :param str style: Стиль цитирования
+
+    :return: рендерер для заданного стиля цитирования.
+    """
+    render_styles_map = {
+        CitationEnum.GOST.name: GOSTRenderer,
+        CitationEnum.APA.name: APARenderer
+    }
+    return render_styles_map.get(style)
 
 
 if __name__ == "__main__":
