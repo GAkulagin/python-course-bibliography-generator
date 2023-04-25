@@ -4,7 +4,6 @@
 from enum import Enum, unique
 
 import click
-
 from formatters.styles.gost import GOSTCitationFormatter
 from logger import get_logger
 from readers.reader import SourcesReader

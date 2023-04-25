@@ -8,7 +8,6 @@ from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH  # pylint: disable=E0611
 from docx.shared import Pt, Mm
 
-
 class BaseRenderer(ABC):
     """
         Базовый класс для создания word-файла
